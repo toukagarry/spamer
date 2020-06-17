@@ -1,9 +1,25 @@
 var Discord = require('discord.js');
 var bot = new Discord.Client();
 var config = require('./config.json');
+const http = require('http');
+const express = require('express');
+const app = express();
+
+if (Number(process.version.slice(1).split(".")[0]) < 8) throw new Error("Node 8.0.0 or higher is required. Update Node on your system.");
+
+app.get("/", (request, response) => {
+  response.sendStatus(200);
+});
+app.listen(process.env.PORT);
+setInterval(() => {
+  http.get(`http://${process.env.PROJECT_DOMAIN}.glitch.me/`);
+}, 280000);
+
 var prefix = config.bot.prefix;
 bot.on('message', msg => {
 var suffix = msg.content.split(' ').slice(1);
+  
+
 //CMDS
 if (msg.content.startsWith(prefix + "help")) {
     var help = suffix[0];
@@ -98,7 +114,26 @@ if (msg.content.startsWith(prefix + "help")) {
         } catch (err) {
         console.log(err)
         }
-        } else
+        } if (msg.content.startsWith(prefix + "stop")) {
+          const embed = new Discord.RichEmbed()
+        .setTitle("Reboot")
+        .setDescription("The bot is rebooting.")
+        .setColor(0xFF4500);
+
+  let owners = "411496838550781972";
+
+  if (!owners.includes(msg.author.id))  {
+    embed
+      .setTitle("Permission Denied")
+      .setDescription("You do not have permission to use this command. It is meant for other users.");
+
+    return msg.channel.send(embed);
+  }
+
+  
+
+  process.exit(1);
+        }else
 //PM
     if (msg.content.startsWith(prefix + "pmspam")) {
         try {
